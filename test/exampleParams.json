@@ -1,0 +1,25 @@
+{
+    "episodeId": 1,
+    "sectionId": 1,
+    "title": "title",
+    "targetAudience": "targetAudience",
+    "tone": "tone",
+    "sections": [
+        {
+            "id": "id",
+            "title": "title",
+            "order": 1,
+            "sourceContent": "sourceContent",
+            "emotion": "emotion",
+            "additionalContext": "additionalContext",
+            "targetDuration": 1,
+            "script": [
+                {
+                    "speakerId": "speakerId",
+                    "speakerName": "speakerName",
+                    "text": "text"
+                }
+            ]
+        }
+    ]
+}

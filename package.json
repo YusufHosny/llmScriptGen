@@ -1,0 +1,33 @@
+{
+  "name": "llmscriptgen",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon src/server.ts",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "http-errors": "~1.6.3",
+    "jade": "^0.29.0",
+    "markdown-it": "^14.1.0",
+    "morgan": "~1.9.1",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.2",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.18",
+    "dotenv": "^16.5.0",
+    "eslint": "^9.27.0",
+    "express": "^5.1.0",
+    "install": "^0.13.0",
+    "npm": "^11.4.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}
