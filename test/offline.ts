@@ -6,6 +6,7 @@ import summarize from '../src/utils/llm/summarize';
 import definePersonas from '../src/utils/llm/personas';
 import generateDialogue from '../src/utils/llm/dialogue';
 import { ScriptParams, SectionMetadata } from '../src/types/service';
+import { Reviser } from '../src/utils/llm/revise';
 
 const input =
 `
@@ -126,19 +127,19 @@ async function main() {
         targetDuration: params.sections[0].targetDuration
     }
 
+    const summary = await summarize(input, Reviser);
+    
+    // const personas = await definePersonas(input);
 
-    const summary = await summarize(input);
-    const personas = await definePersonas(input);
+    // if(!summary || !personas) return;
 
-    if(!summary || !personas) return;
+    // const script = await generateDialogue(personas, summary, metadata);
 
-    const script = await generateDialogue(personas, summary, metadata);
-
-    console.log(JSON.stringify({
-        summary: summary,
-        personas: personas,
-        script: script
-    }));
+    // console.log(JSON.stringify({
+    //     summary: summary,
+    //     personas: personas,
+    //     script: script
+    // }));
 }
 
 main();

@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { SummarySchema } from "../../types/schemas";
 import { Summary } from "../../types/inferred";
+import { ReviserType } from "../../types/system";
 
 const client = new OpenAI();
 
@@ -20,7 +21,9 @@ Second: Create a list of important quotes and statements from any speakers or \
 important figures present in the given text.
 `
 
-async function summarize(input: string) {
+async function summarize(input: string, reviser?: ReviserType) {
+
+
     const response = await client.responses.parse({
     model:  "gpt-4o-mini",
     input: [
@@ -32,8 +35,28 @@ async function summarize(input: string) {
     },
     });
 
+    var result = response.output_parsed as Summary|undefined;
+    if(!result) throw Error("Result was not received");
 
-    return response.output_parsed as Summary|undefined;
+    if(reviser) 
+    {
+        const originalPrompt = JSON.stringify([
+            { role: "system", content: summarizeSystemPrompt },
+            { role: "user", content: input },
+        ]);
+
+        console.log(JSON.stringify({
+            before: result,
+        }));
+
+        result = await reviser.revise(originalPrompt, JSON.stringify(result), SummarySchema) as Summary;
+
+        console.log(JSON.stringify({
+            after: result,
+        }));
+    }
+
+    return result;
 }
 
 export default summarize

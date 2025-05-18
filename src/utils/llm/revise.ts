@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import dedent from "dedent";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from 'zod';
+import { ReviserType } from "../../types/system";
 
 const client = new OpenAI();
 
@@ -39,4 +40,8 @@ async function revise(originalPrompt: string, responseToImprove: string, format:
     return response.output_parsed as z.infer<typeof format>|undefined;
 }
 
-export default revise 
+export const Reviser: ReviserType = {
+    client: client,
+    revise: revise
+}
+
