@@ -1,4 +1,4 @@
-$content = Get-Content -Path .\exampleParams.json
+$content = Get-Content -Path $args[0]
 curl -H 'Content-Type: application/json' `
       -d "$content" `
       -X POST `

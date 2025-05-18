@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ScriptParams, ScriptUrlParams } from "../types/scriptRequestParams";
+import { ScriptParams, ScriptUrlParams } from "../types/service";
 import { Router } from 'express'
 
 const router = Router();

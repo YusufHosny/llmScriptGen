@@ -1,4 +1,4 @@
-$content="`cat exampleParams.json`"
+$content="`cat "$1"`"
 curl -H "Content-Type: application/json" \
       -d "$content" \
       -X POST \
