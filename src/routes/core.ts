@@ -41,7 +41,7 @@ router.post('/:episodeId/sections/:sectionId/script', async (req: Request<Script
       targetDuration: section.targetDuration
   }
 
-  const newSection = await generateDialogue(personas, summary, metadata, script);
+  const newSection = await generateDialogue(personas, summary, metadata, script, undefined, true);
 
   console.log(JSON.stringify({
       summary: summary,
