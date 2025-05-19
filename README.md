@@ -17,4 +17,28 @@ If you want to try offline.ts, which runs the system end to end without the serv
 # Architecture
 TODO
 
+# Included Packages
+From package.json, but here to be clearer.
+- Dependencies
+    - cookie-parser (for express)
+    - debug (for express)
+    - dedent (to include multiline strings without looking weird)
+    - http-errors (for express)
+    - jade (for express)
+    - markdown-it (to render readme page as html on "/" route)
+    - morgan (for express)
+    - nodemon (for hot reloads)
+    - openai (openai api for llm calls)
+    - zod (zod schema definition for object schema and llm response parsing)
+- Development Dependencies
+    - types ...
+    - dotenv (for loading .env into process.env)
+    - eslint (linter)
+    - express (router and webserver package)
+    - install
+    - npm
+    - prettier (prettifier)
+    - typescript
+
 # License Information
+MIT
