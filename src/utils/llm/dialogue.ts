@@ -6,6 +6,8 @@ import { ScriptSchema } from "../../types/schemas";
 import dedent from "dedent";
 import { SectionMetadata } from "../../types/service";
 import { ReviserType } from "../../types/system";
+import estimateDuration from "../estimateDuration";
+import adjustTiming from "./timing";
 
 const client = new OpenAI();
 
@@ -77,6 +79,19 @@ async function generateDialogue(personas: Summary|Personas, summary: Summary, me
         ]);
 
         result = await reviser.revise(originalPrompt, JSON.stringify(result), ScriptSchema) as Script;
+    
+    }
+
+    if(strictTime) {
+        let percentChange = (1 - (estimateDuration(result) / metadata.targetDuration)) * 100;
+
+        // ensure the dialogue is within some percentage of desired duration
+        while (percentChange > 25) { // arbitrary threshold of 25%, can be adjusted
+            result = await adjustTiming(JSON.stringify(result), percentChange, ScriptSchema) as Script|undefined;
+            if(!result) throw Error("Result was not received");
+
+            percentChange = (1 - (estimateDuration(result) / metadata.targetDuration)) * 100;
+        }
     }
 
     return result;

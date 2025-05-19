@@ -1,6 +1,6 @@
 import { Script } from '../types/inferred'
 
-function estimateDuration(script: Script) {
+const estimateDuration = (script: Script) => {
     const expectedWPM = 140; // can be adjusted or possibly dynamic? especially with info on the models generating audio
 
     let duration = 0;
@@ -9,5 +9,7 @@ function estimateDuration(script: Script) {
         duration += nWords/expectedWPM;
     }
 
-    return duration;
+    return duration * 60;
 }
+
+export default estimateDuration;
