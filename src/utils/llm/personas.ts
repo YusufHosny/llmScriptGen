@@ -1,7 +1,9 @@
 import OpenAI from "openai";
 
 import { zodTextFormat } from "openai/helpers/zod";
-import { PersonasSchema } from "../../types/schemas";
+import { PersonasSchema, SummarySchema } from "../../types/schemas";
+import { ReviserType } from "../../types/system";
+import { Personas, Summary } from "../../types/inferred";
 
 const client = new OpenAI();
 
@@ -29,13 +31,15 @@ tone and conversation style are, including their technical jargon usage, their v
 
 !!! DO NOT MAKE THE SPEAKERS REAL PEOPLE, DO NOT USE ANY NAMES OR INFORMATION GIVEN, \
 GENERATE ARBITRARY PERSONAS THAT FIT THE INFORMATION GIVEN !!!
+
+Generate 1 persona for Audience.
+Generate 2 personas for Speakers.
 `
 
-
-
-async function definePersonas(input: string) {
+async function definePersonas(input: string, reviser?: ReviserType, shouldSummarize?: boolean) {
+    
     const response = await client.responses.parse({
-    model:  "gpt-4o-mini",
+    model:  "gpt-4.1",
     input: [
         { role: "system", content: personaSystemPrompt },
         { role: "user", content: input },
@@ -45,9 +49,64 @@ async function definePersonas(input: string) {
     },
     });
 
-    return response.output_parsed;
+    let result = response.output_parsed as Personas|undefined;
+    if(!result) throw Error("Result was not received");
+
+    if(reviser) 
+    {
+        const originalPrompt = JSON.stringify([
+            { role: "system", content: personaSystemPrompt },
+            { role: "user", content: input },
+        ]);
+
+        result = await reviser.revise(originalPrompt, JSON.stringify(result), PersonasSchema) as Personas;
+    }
+
+    if(shouldSummarize) {
+        return await summarizePersonas(JSON.stringify(result));
+    }
+
+    return result;
 }
 
 export default definePersonas 
 
+
+const summarizeSystemPrompt = 
+`
+Given the following Speaker and audience personas, \
+extract and condense all important information to the characterization and \
+behavior of the personas, ensure the names and main information remains, but \
+is divided into clear and concise points. Ensure that whoever reads the \
+summary will understand the characters and their motivations and behavior. \
+`
+
+export const summarizePersonas = async (input: string, reviser?: ReviserType) => {
+
+    const response = await client.responses.parse({
+    model:  "gpt-4o-mini",
+    input: [
+        { role: "system", content: summarizeSystemPrompt },
+        { role: "user", content: input },
+    ],
+    text: {
+        format: zodTextFormat(SummarySchema, "summary"),
+    },
+    });
+
+    let result = response.output_parsed as Summary|undefined;
+    if(!result) throw Error("Result was not received");
+
+    if(reviser) 
+    {
+        const originalPrompt = JSON.stringify([
+            { role: "system", content: summarizeSystemPrompt },
+            { role: "user", content: input },
+        ]);
+
+        result = await reviser.revise(originalPrompt, JSON.stringify(result), SummarySchema) as Summary;
+    }
+
+    return result;
+}
 

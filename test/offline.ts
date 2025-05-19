@@ -7,6 +7,7 @@ import definePersonas from '../src/utils/llm/personas';
 import generateDialogue from '../src/utils/llm/dialogue';
 import { ScriptParams, SectionMetadata } from '../src/types/service';
 import { Reviser } from '../src/utils/llm/revise';
+import { Script } from '../src/types/inferred';
 
 const input =
 `
@@ -103,43 +104,76 @@ SuperNova 2025 is not just about discussing the future; it's about building it. 
 
 © 2025 Delaware Consulting CV - BE 0479.117.543 • Terms of Use • Privacy Statement • Responsible Disclosure • Cookie Policy
 `
-
+// thie defines an end2end test of the system
+// generating a full script by basically piping the
+// scripts from each section to generate the next
+// until a full script is gend
 async function main() {
     const params: ScriptParams = {
-        episodeId: "1",
-        sectionId: "1",
+        episodeId: "0",
+        sectionId: "0",
         title: "Delaware is going SuperNova",
         sections: [
             {
-            id: "1",
+            id: "0",
             title: "Introduction",
             order: 0,
             sourceContent: input ,
             targetDuration: 35,
+            },
+            {
+            id: "1",
+            title: "The Delaware DEL20",
+            order: 1,
+            sourceContent: input ,
+            targetDuration: 100,
+            },
+            {
+            id: "2",
+            title: "Practical Information",
+            order: 2,
+            sourceContent: input ,
+            targetDuration: 60,
+            },
+            {
+            id: "3",
+            title: "Conclusion and Call to Action",
+            order: 3,
+            sourceContent: input ,
+            targetDuration: 40,
             }
         ]
     }
 
-    const metadata: SectionMetadata = {
-        episodeTitle: params.title,
-        sectionTitle: params.sections[0].title,
-        order: params.sections[0].order,
-        targetDuration: params.sections[0].targetDuration
+    const summary = await summarize(input, Reviser);
+    const personas = await definePersonas(input, Reviser);
+    if(!summary || !personas) return;
+
+    let script: Script|undefined = undefined;
+
+    for (const section of params.sections) {
+        const metadata: SectionMetadata = {
+            episodeTitle: params.title,
+            sectionTitle: section.title,
+            order: section.order,
+            targetDuration: section.targetDuration
+        }
+
+        const newSection = await generateDialogue(personas, summary, metadata, script);
+
+        if(!script) {
+            script = newSection;
+        }
+        else {
+            script.lines = script.lines.concat(newSection.lines);
+        }
     }
 
-    const summary = await summarize(input, Reviser);
-    
-    // const personas = await definePersonas(input);
-
-    // if(!summary || !personas) return;
-
-    // const script = await generateDialogue(personas, summary, metadata);
-
-    // console.log(JSON.stringify({
-    //     summary: summary,
-    //     personas: personas,
-    //     script: script
-    // }));
+    console.log(JSON.stringify({
+        summary: summary,
+        personas: personas,
+        script: script
+    }));
 }
 
 main();
